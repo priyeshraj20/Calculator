@@ -27,12 +27,34 @@ const clearDisplay = () => {
     inputDisplay.innerText = "";
 }
 
+const operators = ["+", "-", "*", "/"];
 
-//calculator functions
-
-const addition = () => {
-
+const parseExpression = (str) => {
+  try {
+    const result = new Function(`return ${str}`)();
+    return parseFloat(result.toFixed(10)); // limit floating point issues
+  } catch (e) {
+    return "Error";
+  }
 };
+
+const handleOperator = (operator) => {
+  let display = inputDisplay.innerText;
+
+  if (display === "") return; // Don't allow operator first
+
+  const lastChar = display.slice(-1);
+
+  if (operators.includes(lastChar)) {
+    // Replace existing operator
+    inputDisplay.innerText = display.slice(0, -1) + operator;
+  } else {
+    // Evaluate current expression, then add operator
+    const evaluated = parseExpression(display);
+    inputDisplay.innerText = evaluated + operator;
+  }
+};
+
 
 oneBtn.addEventListener("click", ()=>buttonToDisplay(oneBtn.value));
 twoBtn.addEventListener("click", ()=>buttonToDisplay(twoBtn.value));
@@ -45,26 +67,28 @@ eightBtn.addEventListener("click", ()=>buttonToDisplay(eightBtn.value));
 nineBtn.addEventListener("click", ()=>buttonToDisplay(nineBtn.value));
 zeroBtn.addEventListener("click", ()=>buttonToDisplay(zeroBtn.value));
 clearBtn.addEventListener("click", ()=>clearDisplay());
+1
+plusBtn.addEventListener("click", () => handleOperator("+"));
+minusBtn.addEventListener("click", () => handleOperator("-"));
+multiplyBtn.addEventListener("click", () => handleOperator("*"));
+divisionBtn.addEventListener("click", () => handleOperator("/"));
 
-plusBtn.addEventListener("click",()=>{
-    buttonToDisplay(plusBtn.value);
-});
-
-minusBtn.addEventListener("click", ()=>{
-    buttonToDisplay(minusBtn.value);
-});
-
-multiplyBtn.addEventListener("click", ()=>{
-    buttonToDisplay(multiplyBtn.value);
-});
-
-divisionBtn.addEventListener("click", ()=>{
-    buttonToDisplay(divisionBtn.value);
-});
 
 equalBtn.addEventListener("click", ()=>{
-   return; 
+ const expression = inputDisplay.innerText;
+  const lastChar = expression.slice(-1);
+
+  if (operators.includes(lastChar)) {
+    inputDisplay.innerText = "Error"; // Prevent evaluating incomplete expressions
+    return;
+  }
+
+  try {
+    const result = new Function(`return ${expression}`)();
+    inputDisplay.innerText = parseFloat(result.toFixed(10));
+  } catch (error) {
+    inputDisplay.innerText = "Error";
+  }
 });
 
 
-clearBtn.addEventListener("click", ()=>clearDisplay());
